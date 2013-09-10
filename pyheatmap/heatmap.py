@@ -14,6 +14,7 @@ pyHeatMap
 import os
 import random
 import Image
+import ImageDraw
 import ImageDraw2
 from inc import cf
 
@@ -183,7 +184,7 @@ class HeatMap(object):
 
         return data2
 
-    def heatmap(self, save_as=None, base=None, data=None):
+    def heatmap(self, save_as=None, base=None, data=None, blackbg=False):
         u"""绘制热图"""
 
         self.__mkImg()
@@ -201,6 +202,8 @@ class HeatMap(object):
             self.__heat(heat_data, x, y, n, circle)
 
         self.__paintHeat(heat_data, cf.mkColors())
+        if blackbg == True:
+            self.__make_img_gray()
 
         if save_as:
             self.save_as = save_as
@@ -218,6 +221,24 @@ class HeatMap(object):
         self.__im.save(save_as)
         self.__im = None
 
+    def __make_img_gray(self):
+        """将图像进行变换，增加灰色背景"""
+        new = Image.new("RGBA", self.__im.size, (0, 0, 0, 200))
+        dw = ImageDraw.Draw(new)
+        alpha = 200
+        rate = 5
+        for x in range(self.__im.size[0]):
+            for y in range(self.__im.size[1]):
+                color = self.__im.getpixel((x, y))
+                alpha_old = color[3] / 240.0
+                alpha_new = alpha / 240.0
+                al = alpha_old + alpha_new - alpha_old * alpha_new
+                new_color = [int(i * alpha_old * (1 - alpha_new) / al * rate) for i in color[:3]]
+                al_current = int(al * 240)
+                new_color.append(al_current)
+                dw.point((x, y), tuple(new_color))
+        self.__im = new
+        return True
 
 def test():
     u"""测试方法"""

@@ -44,12 +44,12 @@ def example1():
     # 开始绘制
     hm = HeatMap(data)
     hm.clickmap(save_as="hit.png")
-    hm.heatmap(save_as="heat.png")
+    hm.heatmap(save_as="heat.png",blackbg=True)
 
 
 def main():
-#    example1()
-    example2()
+    example1()
+#    example2()
 
 
 if __name__ == "__main__":
